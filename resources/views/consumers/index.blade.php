@@ -1,4 +1,4 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -6,9 +6,12 @@
         <h1 style="margin:0; color:#006633;">Defaulters Master Record</h1>
         <p style="margin:0; color:#666;">Manage, edit, and delete seeded consumer profiles.</p>
     </div>
-    <a href="{{ route('consumers.create') }}" style="background: #006633; color: white; padding: 10px 15px; text-decoration: none; border-radius: 3px; font-weight: bold;">
-        <i class="fa-solid fa-plus"></i> Add Defaulter
-    </a>
+
+    @if(auth()->check() && auth()->user()->isAdmin())
+        <a href="{{ route('consumers.create') }}" style="background: #006633; color: white; padding: 10px 15px; text-decoration: none; border-radius: 3px; font-weight: bold;">
+            <i class="fa-solid fa-plus"></i> Add Defaulter
+        </a>
+    @endif
 </div>
 
 @if(session('success'))
@@ -32,7 +35,10 @@
                 <th style="padding: 12px; border-bottom: 2px solid #ccc;">Tariff</th>
                 <th style="padding: 12px; border-bottom: 2px solid #ccc;">Status</th>
                 <th style="padding: 12px; border-bottom: 2px solid #ccc;">Outstanding</th>
-                <th style="padding: 12px; border-bottom: 2px solid #ccc;">Actions</th>
+
+                @if(auth()->check() && auth()->user()->isAdmin())
+                    <th style="padding: 12px; border-bottom: 2px solid #ccc;">Actions</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -47,19 +53,22 @@
                     </span>
                 </td>
                 <td style="padding: 12px; color: #cc0000; font-weight: bold;">Rs {{ number_format($consumer->outstanding_amount) }}</td>
-                <td style="padding: 12px; display: flex; gap: 5px;">
-                    <a href="{{ route('consumers.edit', $consumer->id) }}" style="padding: 5px 10px; background: #f0f0f0; border: 1px solid #ccc; color: #333; text-decoration: none; font-size: 12px;">Edit</a>
 
-                    <form action="{{ route('consumers.destroy', $consumer->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" style="padding: 5px 10px; background: #cc0000; border: 1px solid #990000; color: white; cursor: pointer; font-size: 12px;">Delete</button>
-                    </form>
-                </td>
+                @if(auth()->check() && auth()->user()->isAdmin())
+                    <td style="padding: 12px; display: flex; gap: 5px;">
+                        <a href="{{ route('consumers.edit', $consumer->id) }}" style="padding: 5px 10px; background: #f0f0f0; border: 1px solid #ccc; color: #333; text-decoration: none; font-size: 12px;">Edit</a>
+
+                        <form action="{{ route('consumers.destroy', $consumer->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="padding: 5px 10px; background: #cc0000; border: 1px solid #990000; color: white; cursor: pointer; font-size: 12px;">Delete</button>
+                        </form>
+                    </td>
+                @endif
             </tr>
             @empty
             <tr>
-                <td colspan="6" style="padding: 20px; text-align: center; color: #666;">No records found.</td>
+                <td colspan="100%" style="padding: 20px; text-align: center; color: #666;">No records found.</td>
             </tr>
             @endforelse
         </tbody>
